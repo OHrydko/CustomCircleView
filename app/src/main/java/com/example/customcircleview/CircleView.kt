@@ -3,6 +3,7 @@ package com.example.customcircleview
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
@@ -17,25 +18,35 @@ class CircleView @JvmOverloads constructor(
 ) : View(context, attrs, defStyle, defStyleRes) {
 
 
-    private val radius = 46
     private val size: Int = 15
     private var listCircle = ArrayList<Circle>()
+    private var listColor = ArrayList<Int>()
 
     init {
+        setListColor()
         for (item in 0..size) {
-            listCircle.add(Circle((0..1000).random(), (0..1000).random()))
+            listCircle.add(
+                Circle(
+                    (0..1000).random(),
+                    (0..1000).random(),
+                    (10..20).random(),
+                    (10..20).random(),
+                    (20..50).random(),
+                    listColor.random()
+                )
+            )
         }
     }
-
 
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas?) {
         val paint = Paint()
 
-        val rightLimit: Int = width - radius
-        val bottomLimit: Int = height - radius
-
         for (circle in listCircle) {
+
+            val rightLimit: Int = width - circle.radius
+            val bottomLimit: Int = height - circle.radius
+
             circle.x += circle.speedX
             circle.y += circle.speedY
             paint.color = circle.color
@@ -47,8 +58,8 @@ class CircleView @JvmOverloads constructor(
             }
 
             //left limit
-            if (circle.x <= radius) {
-                circle.x = radius
+            if (circle.x <= circle.radius) {
+                circle.x = circle.radius
                 circle.speedX *= -1
             }
             //bottom limit
@@ -57,8 +68,8 @@ class CircleView @JvmOverloads constructor(
                 circle.speedY *= -1
             }
             //top limit
-            if (circle.y <= radius) {
-                circle.y = radius
+            if (circle.y <= circle.radius) {
+                circle.y = circle.radius
                 circle.speedY *= -1
             }
 
@@ -66,41 +77,54 @@ class CircleView @JvmOverloads constructor(
 
                 if (item != circle) {
 
-                    val diffSqrtX = (circle.x - item.x) * (circle.x - item.x)
-                    val diffSqrtY = (circle.y - item.y) * (circle.y - item.y)
-                    val radiusSqrt = (radius + radius) * (radius + radius)
+                    val diffX = (circle.x - item.x) * (circle.x - item.x)
+                    val diffY = (circle.y - item.y) * (circle.y - item.y)
+                    val radius = (circle.radius + item.radius) * (circle.radius + item.radius)
 
-                    if (diffSqrtX + diffSqrtY <= radiusSqrt) {
+                    if (diffX + diffY <= radius) {
 
                         circle.speedX *= -1
                         circle.speedY *= -1
 
                         item.speedX *= -1
                         item.speedY *= -1
+
                         circle.apply {
                             if (x < item.x) {
-                                x -= 1
-                                item.x += 1
+                                x -= 10
+                                item.x += 10
                             } else {
-                                x += 1
-                                item.x -= 1
+                                x += 10
+                                item.x -= 10
                             }
 
                             if (y < item.y) {
-                                y -= 1
-                                item.y += 1
+                                y -= 10
+                                item.y += 10
                             } else {
-                                y += 1
-                                item.y -= 1
+                                y += 10
+                                item.y -= 10
                             }
                         }
                     }
                 }
             }
-            canvas?.drawCircle(circle.x.toFloat(), circle.y.toFloat(), radius.toFloat(), paint)
+            canvas?.drawCircle(
+                circle.x.toFloat(),
+                circle.y.toFloat(),
+                circle.radius.toFloat(),
+                paint
+            )
         }
 
         invalidate()
 
+    }
+
+    private fun setListColor() {
+        listColor.add(Color.RED)
+        listColor.add(Color.GREEN)
+        listColor.add(Color.YELLOW)
+        listColor.add(Color.BLUE)
     }
 }
