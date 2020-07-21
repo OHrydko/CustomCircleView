@@ -6,5 +6,6 @@ data class Circle(
     var speedX: Int,
     var speedY: Int,
     var radius: Int,
-    var color: Int
+    var color: Int,
+    var direction: String
 )

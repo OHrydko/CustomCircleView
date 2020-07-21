@@ -6,6 +6,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import java.util.*
 
@@ -21,34 +22,59 @@ class CircleView @JvmOverloads constructor(
     private val size: Int = 15
     private var listCircle = ArrayList<Circle>()
     private var listColor = ArrayList<Int>()
+    private var listDirection = ArrayList<String>()
+    private var count = 0
 
     init {
         setListColor()
+        setListDirection()
         for (item in 0..size) {
             listCircle.add(
                 Circle(
                     (0..1000).random(),
                     (0..1000).random(),
-                    (10..20).random(),
-                    (10..20).random(),
+                    (15..20).random(),
+                    (15..20).random(),
                     (20..50).random(),
-                    listColor.random()
+                    listColor.random(),
+                    listDirection.random()
                 )
             )
         }
     }
 
+
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas?) {
         val paint = Paint()
-
         for (circle in listCircle) {
 
             val rightLimit: Int = width - circle.radius
             val bottomLimit: Int = height - circle.radius
-
+            if (count < listCircle.size) {
+                when (circle.direction) {
+                    "North-East" -> {
+                        circle.speedY *= -1
+                        circle.speedX *= 1
+                    }
+                    "North-West" -> {
+                        circle.speedY *= -1
+                        circle.speedX *= -1
+                    }
+                    "South-East" -> {
+                        circle.speedY *= 1
+                        circle.speedX *= 1
+                    }
+                    "South-West" -> {
+                        circle.speedY *= 1
+                        circle.speedX *= -1
+                    }
+                }
+                count += 1
+            }
             circle.x += circle.speedX
             circle.y += circle.speedY
+
             paint.color = circle.color
 
             //right limit
@@ -126,5 +152,12 @@ class CircleView @JvmOverloads constructor(
         listColor.add(Color.GREEN)
         listColor.add(Color.YELLOW)
         listColor.add(Color.BLUE)
+    }
+
+    private fun setListDirection() {
+        listDirection.add("North-East")
+        listDirection.add("North-West")
+        listDirection.add("South-East")
+        listDirection.add("South-West")
     }
 }
